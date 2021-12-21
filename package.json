@@ -43,7 +43,7 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "preinstall": "node scripts/use-yarn.js",
+    "preinstall": "node scripts/use-yarn.js && node scripts/setup-cloudflare-pages",
     "prepare": "husky install",
     "dev": "craco start",
     "start": "craco start",
