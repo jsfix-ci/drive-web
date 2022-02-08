@@ -160,14 +160,14 @@ export const planSelectors = {
   planLimitToShow: (state: RootState): number => {
     const isTeam = sessionSelectors.isTeam(state);
     const team = state.team.team;
-    const limit = isTeam ? state.plan.planLimit / (team?.total_members || 1) : state.plan.planLimit;
+    const limit = isTeam ? state.plan.planLimit / (team?.totalMembers || 1) : state.plan.planLimit;
 
     return limit;
   },
   isPlanActive:
     (state: RootState) =>
-    (priceId: string): boolean =>
-      state.plan.individualPlan?.planId === priceId || state.plan.teamPlan?.planId === priceId,
+      (priceId: string): boolean =>
+        state.plan.individualPlan?.planId === priceId || state.plan.teamPlan?.planId === priceId,
 };
 
 export const planActions = planSlice.actions;

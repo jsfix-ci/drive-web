@@ -205,9 +205,9 @@ export function getEnvironmentConfig(isTeam?: boolean): EnvironmentConfig {
     const team = localStorageService.getTeams() as TeamsSettings;
 
     return {
-      bridgeUser: team.bridge_user,
-      bridgePass: team.bridge_password,
-      encryptionKey: team.bridge_mnemonic,
+      bridgeUser: team.bridgeUser,
+      bridgePass: team.bridgePassword,
+      encryptionKey: team.bridgeMnemonic,
       bucketId: team.bucket,
       useProxy: process.env.REACT_APP_DONT_USE_PROXY !== 'true',
     };

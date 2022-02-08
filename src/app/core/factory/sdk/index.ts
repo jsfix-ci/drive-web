@@ -113,7 +113,7 @@ export class SdkFactory {
   private getMnemonic(workspace: string): string {
     const mnemonicByWorkspace: { [key in Workspace]: string } = {
       [Workspace.Individuals]: this.localStorage.get('xMnemonic') || '',
-      [Workspace.Business]: this.localStorage.getTeams()?.bridge_mnemonic || '',
+      [Workspace.Business]: this.localStorage.getTeams()?.bridgeMnemonic || '',
     };
     return mnemonicByWorkspace[workspace];
   }

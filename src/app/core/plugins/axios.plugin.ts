@@ -16,7 +16,7 @@ const axiosPlugin: AppPlugin = {
       };
       const mnemonicByWorkspace: { [key in Workspace]: string } = {
         [Workspace.Individuals]: localStorageService.get('xMnemonic') || '',
-        [Workspace.Business]: localStorageService.getTeams()?.bridge_mnemonic || '',
+        [Workspace.Business]: localStorageService.getTeams()?.bridgeMnemonic || '',
       };
       const workspace =
         requestConfig.authWorkspace ||

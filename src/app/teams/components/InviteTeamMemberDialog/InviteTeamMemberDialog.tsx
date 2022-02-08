@@ -10,7 +10,7 @@ import { RootState } from 'app/store';
 import BaseInput from 'app/shared/components/forms/inputs/BaseInput';
 import AuthButton from 'app/shared/components/AuthButton';
 import BaseDialog from 'app/shared/components/BaseDialog/BaseDialog';
-import { getMembers, removeMember, sendEmailTeamsMember } from '../../services/teams.service';
+import { getMembers, removeInvitation, removeMember, sendEmailTeamsMember } from '../../services/teams.service';
 import { uiActions } from 'app/store/slices/ui';
 import i18n from 'app/i18n/services/i18n.service';
 import notificationsService, { ToastType } from 'app/notifications/services/notifications.service';
@@ -34,6 +34,7 @@ const InviteTeamMemberDialog = ({ team }: InviteTeamMemberDialogProps) => {
 
   useEffect(() => {
     getMembers().then((member) => {
+      console.log('members', JSON.stringify(members, null, 2));
       setMembers(member);
     });
   }, []);
@@ -68,13 +69,19 @@ const InviteTeamMemberDialog = ({ team }: InviteTeamMemberDialogProps) => {
     const resource = memberToDelete.isMember ? 'member' : 'invitation';
 
     try {
-      await removeMember(memberToDelete);
+      if (resource === 'member') {
+        await removeMember(memberToDelete);
+      } else {
+        // await removeInvitation(memberToDelete.)
+      }
+      
       const filterRemovedMember = members.filter((member) => member.user !== memberToDelete.user);
 
       setMembers(filterRemovedMember);
       notificationsService.show(i18n.get('success.deletedTeamMember', { resource }), ToastType.Success);
     } catch (err: unknown) {
-      notificationsService.show(i18n.get('error.deleteTeamMember'), ToastType.Error);
+      const castedError = errorService.castError(err);
+      notificationsService.show(castedError.message, ToastType.Error);
     }
   };
 

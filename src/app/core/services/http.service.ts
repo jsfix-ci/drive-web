@@ -35,7 +35,7 @@ const httpService = {
 
     if (withMnemonic) {
       isTeam
-        ? headers.append('internxt-mnemonic', `${localStorageService.getTeams()?.bridge_mnemonic}`)
+        ? headers.append('internxt-mnemonic', `${localStorageService.getTeams()?.bridgeMnemonic}`)
         : headers.append('internxt-mnemonic', `${localStorageService.get('xMnemonic')}`);
     }
 

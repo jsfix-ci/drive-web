@@ -20,8 +20,6 @@ export interface JoinTeamViewProps {
 interface JoinTeamViewState {
   isTeamActivated: boolean | null;
   isTeamError: boolean;
-  member?: string;
-  teamPassword?: string;
 }
 
 class JoinTeamView extends React.Component<JoinTeamViewProps, JoinTeamViewState> {
@@ -29,9 +27,7 @@ class JoinTeamView extends React.Component<JoinTeamViewProps, JoinTeamViewState>
     super(props);
     this.state = {
       isTeamActivated: null,
-      isTeamError: false,
-      member: '',
-      teamPassword: '',
+      isTeamError: false
     };
   }
 
@@ -44,11 +40,7 @@ class JoinTeamView extends React.Component<JoinTeamViewProps, JoinTeamViewState>
 
     fetch(`${process.env.REACT_APP_API_URL}/api/teams/join/${token}`, {
       method: 'post',
-      headers: httpService.getHeaders(false, false),
-      body: JSON.stringify({
-        member: this.state.member,
-        teamPassword: this.state.teamPassword,
-      }),
+      headers: httpService.getHeaders(false, false)
     })
       .then((response) => {
         if (response.status === 200) {
