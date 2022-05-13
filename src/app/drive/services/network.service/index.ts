@@ -69,33 +69,6 @@ export class Network {
   }
 
   /**
-   * Uploads a file to the Internxt Network
-   * @param bucketId Bucket where file is going to be uploaded
-   * @param params Required params for uploading a file
-   * @returns Id of the created file
-   */
-  uploadFile(bucketId: string, params: IUploadParams): [Promise<string>, Abortable | undefined] {
-    if (!bucketId) {
-      throw new Error('Bucket id not provided');
-    }
-
-    if (params.filesize === 0) {
-      throw new Error('File size can not be 0');
-    }
-
-    return uploadFile(bucketId, {
-      ...params,
-      ...{
-        progressCallback: (totalBytes, uploadedBytes) => {
-          params.progressCallback(uploadedBytes / totalBytes, totalBytes, uploadedBytes);
-        }
-      },
-      creds: this.creds,
-      mnemonic: this.mnemonic,
-    });
-  }
-
-  /**
    * Downloads a file from the Internxt Network
    * @param bucketId Bucket where file is uploaded
    * @param fileId Id of the file to be downloaded
