@@ -83,88 +83,13 @@ function getAuthFromCredentials(creds: NetworkCredentials): { username: string, 
   };
 }
 
+/**
+ * Uploads a file to the Internxt Network
+ * @param bucketId Bucket where file is going to be uploaded
+ * @param params Required params for uploading a file
+ * @returns Id of the created file
+ */
 export function uploadFile(bucketId: string, params: IUploadParams): [Promise<string>, Abortable | undefined] {
-  let aborted = false;
-  let uploadAbortable: Abortable;
-
-  const file: File = params.filecontent;
-  const eventEmitter = new EventEmitter().once('abort', () => {
-    aborted = true;
-    uploadAbortable?.abort();
-  });
-
-  const uploadPromise = (async () => {
-    const index = randomBytes(32);
-    const iv = index.slice(0, 16);
-
-    const frameId = await prepareUpload(bucketId, params.creds);
-    if (aborted) {
-      throw new UploadAbortedError();
-    }
-
-    const encryptionKey = await Environment.utils.generateFileKey(params.mnemonic, bucketId, index);
-    if (aborted) {
-      throw new UploadAbortedError();
-    }
-
-    const [encryptedFile, fileHash] = await getEncryptedFile(file, createAES256Cipher(encryptionKey, iv));
-
-    const shardMeta = {
-      hash: fileHash,
-      index: 0,
-      parity: false,
-      size: params.filesize,
-    };
-    if (aborted) {
-      throw new UploadAbortedError();
-    }
-
-    const uploadUrl = new URL(await getUploadUrl(frameId, shardMeta, params.creds));
-    if (aborted) {
-      throw new UploadAbortedError();
-    }
-
-    const useProxy = !uploadUrl.hostname.includes('internxt');
-
-    const [uploadPromise, uploadFileAbortable] = await uploadFileBlob(
-      encryptedFile,
-      (useProxy && process.env.REACT_APP_PROXY + '/') + uploadUrl.toString(),
-      {
-        progressCallback: (totalBytes, uploadedBytes) => params.progressCallback(totalBytes, uploadedBytes),
-      },
-    );
-
-    uploadAbortable = uploadFileAbortable;
-    await uploadPromise;
-
-    const encryptedFilename = await encryptFilename(params.mnemonic, bucketId, v4());
-    if (aborted) {
-      throw new UploadAbortedError();
-    }
-
-    return finishUpload(
-      params.mnemonic,
-      bucketId,
-      frameId,
-      encryptedFilename,
-      index,
-      encryptionKey,
-      shardMeta,
-      params.creds,
-    );
-  })();
-
-  return [
-    uploadPromise,
-    {
-      abort: () => {
-        eventEmitter.emit('abort');
-      },
-    },
-  ];
-}
-
-export function uploadFileV2(bucketId: string, params: IUploadParams): [Promise<string>, Abortable | undefined] {
   let uploadAbortable: Abortable;
 
   const file: File = params.filecontent;
