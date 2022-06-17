@@ -1,4 +1,4 @@
-import { Storage, Share, Users, Referrals, Payments, Backups } from '@internxt/sdk/dist/drive';
+import { Storage, Share, Users, Referrals, Payments, Backups, ShareV2 } from '@internxt/sdk/dist/drive';
 import { Auth, Token } from '@internxt/sdk/dist/auth';
 import { ApiSecurity, ApiUrl, AppDetails } from '@internxt/sdk/dist/shared';
 import packageJson from '../../../../../package.json';
@@ -51,6 +51,13 @@ export class SdkFactory {
     const appDetails = SdkFactory.getAppDetails();
     const apiSecurity = this.getApiSecurity();
     return Share.client(apiUrl, appDetails, apiSecurity);
+  }
+
+  public createShareV2Client(): ShareV2 {
+    const apiUrl = this.getApiV2Url();
+    const appDetails = SdkFactory.getAppDetails();
+    const apiSecurity = this.getNewApiSecurity();
+    return ShareV2.client(apiUrl, appDetails, apiSecurity);
   }
 
   public createUsersClient(): Users {
@@ -108,8 +115,22 @@ export class SdkFactory {
     };
   }
 
+  private getNewApiSecurity(): ApiSecurity {
+    const workspace = this.localStorage.getWorkspace();
+    return {
+      mnemonic: this.getMnemonic(workspace),
+      token: this.getNewToken(workspace),
+      unauthorizedCallback: async () => {
+        this.dispatch(userThunks.logoutThunk());
+      },
+    };
+  }
+
   private getApiUrl(): ApiUrl {
     return this.apiUrl + '/api';
+  }
+  private getApiV2Url(): ApiUrl {
+    return String(process.env.REACT_APP_API_V2_URL);
   }
 
   private static getAppDetails(): AppDetails {
@@ -130,6 +151,14 @@ export class SdkFactory {
   private getToken(workspace: string): Token {
     const tokenByWorkspace: { [key in Workspace]: string } = {
       [Workspace.Individuals]: this.localStorage.get('xToken') || '',
+      [Workspace.Business]: this.localStorage.get('xTokenTeam') || '',
+    };
+    return tokenByWorkspace[workspace];
+  }
+
+  private getNewToken(workspace: string): Token {
+    const tokenByWorkspace: { [key in Workspace]: string } = {
+      [Workspace.Individuals]: this.localStorage.get('xNewToken') || '',
       [Workspace.Business]: this.localStorage.get('xTokenTeam') || '',
     };
     return tokenByWorkspace[workspace];

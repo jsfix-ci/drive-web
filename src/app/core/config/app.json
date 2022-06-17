@@ -61,6 +61,13 @@
       "auth": true
     },
     {
+      "id": "shareds",
+      "layout": "header-and-sidenav",
+      "path": "/app/shareds",
+      "exact": true,
+      "auth": true
+    },
+    {
       "id": "photos",
       "layout": "header-and-sidenav",
       "path": "/app/photos",

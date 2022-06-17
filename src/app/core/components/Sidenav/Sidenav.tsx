@@ -74,6 +74,7 @@ class Sidenav extends React.Component<SidenavProps, SidenavState> {
             <SidenavItem label="Drive" to="/app" Icon={FolderSimple} />
             <SidenavItem label="Photos" to="/app/photos" Icon={ImageSquare} showNew />
             <SidenavItem label="Backups" to="/app/backups" Icon={ClockCounterClockwise} />
+            <SidenavItem label="Shared links" to="/app/shareds" Icon={ClockCounterClockwise} />
             <SidenavItem label="Recents" to="/app/recents" Icon={Clock} />
             <SidenavItem label="Desktop App" Icon={Desktop} onClick={this.onDownloadAppButtonClicked} />
           </div>

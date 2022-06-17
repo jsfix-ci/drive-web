@@ -106,6 +106,7 @@ export enum AppView {
   Drive = 'drive',
   Recents = 'recents',
   Backups = 'backups',
+  Shareds = 'shareds',
   Photos = 'photos',
   Account = 'account',
   TeamsJoin = 'teams-join',

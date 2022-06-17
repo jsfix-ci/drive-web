@@ -203,10 +203,14 @@ export default function SignInView(): JSX.Element {
               text="Sign in"
               textWhenDisabled={isValid ? 'Decrypting...' : 'Sign in'}
             />
+            
           </div>
         </form>
 
         <div className="flex flex-col items-center w-72">
+            <span onClick={(): void => {
+              throw Error('ERROR TO SENTRY');
+            }}>ERROR</span>
           <span
             onClick={(): void => {
               analyticsService.trackUserResetPasswordRequest();

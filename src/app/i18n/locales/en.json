@@ -358,6 +358,19 @@
       "advice": "Please confirm that you want to delete these items. This action can't be undone."
     }
   },
+  "shareLinks": {
+    "sharedLinks": "Shared Links",
+    "list": {
+      "columns": {
+        "name": "Link Content",
+        "created": "Created",
+        "shared": "Shared"
+      }
+    },
+    "deleteItems": {
+      "advice": "Please confirm that you want to delete these items. This action can't be undone."
+    }
+  },
   "appSumo": {
     "tiers": {
       "internxt_tier1": "AppSumo Lifetime Tier 1",
