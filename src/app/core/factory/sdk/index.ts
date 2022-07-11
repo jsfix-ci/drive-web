@@ -1,4 +1,4 @@
-import { Storage, Share, Users, Referrals, Payments, Backups, ShareV2 } from '@internxt/sdk/dist/drive';
+import { Storage, Share, Users, Referrals, Payments, Backups } from '@internxt/sdk/dist/drive';
 import { Auth, Token } from '@internxt/sdk/dist/auth';
 import { ApiSecurity, ApiUrl, AppDetails } from '@internxt/sdk/dist/shared';
 import packageJson from '../../../../../package.json';
@@ -53,11 +53,11 @@ export class SdkFactory {
     return Share.client(apiUrl, appDetails, apiSecurity);
   }
 
-  public createShareV2Client(): ShareV2 {
+  public createShareV2Client(): Share {
     const apiUrl = this.getApiV2Url();
     const appDetails = SdkFactory.getAppDetails();
     const apiSecurity = this.getNewApiSecurity();
-    return ShareV2.client(apiUrl, appDetails, apiSecurity);
+    return Share.client(apiUrl, appDetails, apiSecurity);
   }
 
   public createUsersClient(): Users {
