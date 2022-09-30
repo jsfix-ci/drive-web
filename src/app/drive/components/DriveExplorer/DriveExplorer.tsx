@@ -1,4 +1,4 @@
-import { createRef, ReactNode, forwardRef, useState, RefObject, useEffect } from 'react';
+import { createRef, useState, RefObject, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
   Trash,
@@ -197,17 +197,21 @@ const DriveExplorer = (props: DriveExplorerProps): JSX.Element => {
   );
 
   const separatorV = <div className="mx-3 my-2 border-r border-gray-10" />;
-  const separatorH = <div className="my-0.5 mx-3 border-t border-gray-10" />;
-  const MenuItem = forwardRef(({ children, onClick }: { children: ReactNode; onClick: () => void }, ref) => {
-    return (
-      <div
-        className="flex cursor-pointer items-center py-2 px-3 text-gray-80 hover:bg-gray-5 active:bg-gray-10"
-        onClick={onClick}
-      >
-        {children}
-      </div>
-    );
-  });
+  // const separatorH = <div className="my-0.5 mx-3 border-t border-gray-10" />;
+  // const MenuItem = forwardRef(
+  //   ({ children, onClick, active }: { children: ReactNode; onClick: () => void; active?: boolean }, ref) => {
+  //     return (
+  //       <div
+  //         className={`flex cursor-pointer items-center py-2 px-3 text-gray-80 ${
+  //           active && 'bg-primary'
+  //         } hover:bg-gray-5 active:bg-gray-10`}
+  //         onClick={onClick}
+  //       >
+  //         {children}
+  //       </div>
+  //     );
+  //   },
+  // );
 
   const driveExplorer = (
     <div className="flex h-full flex-grow flex-col px-8" data-test="drag-and-drop-area">
@@ -217,7 +221,11 @@ const DriveExplorer = (props: DriveExplorerProps): JSX.Element => {
       <div className="z-0 flex h-full w-full max-w-full flex-grow">
         <div className="flex w-1 flex-grow flex-col pt-6">
           <div className="z-10 flex max-w-full justify-between pb-4">
-            <div className={`flex w-full min-w-0 flex-1 flex-row items-center text-lg ${titleClassName || ''}`}>
+            <div
+              className={`relative mr-20 flex min-w-0 flex-1 flex-shrink-0 flex-row items-center text-lg ${
+                titleClassName || ''
+              }`}
+            >
               {title}
             </div>
 
@@ -228,22 +236,22 @@ const DriveExplorer = (props: DriveExplorerProps): JSX.Element => {
                 }
                 openDirection={'right'}
                 classMenuItems={
-                  'right-0 w-max rounded-md border border-black border-opacity-8 bg-white py-1.5 drop-shadow mt-6'
+                  'right-0 w-max rounded-md border border-black border-opacity-8 bg-white py-1.5 drop-shadow mt-1'
                 }
                 menuItems={[
-                  <MenuItem onClick={onCreateFolderButtonClicked}>
+                  <div className="flex flex-row items-center space-x-3 py-2 px-3" onClick={onCreateFolderButtonClicked}>
                     <FolderSimplePlus size={20} />
-                    <p className="ml-3">{i18n.get('actions.upload.folder')}</p>
-                  </MenuItem>,
-                  separatorH,
-                  <MenuItem onClick={onUploadFileButtonClicked}>
+                    <p>{i18n.get('actions.upload.folder')}</p>
+                  </div>,
+                  'separator',
+                  <div className="flex flex-row items-center space-x-3 py-2 px-3" onClick={onUploadFileButtonClicked}>
                     <FileArrowUp size={20} />
-                    <p className="ml-3">{i18n.get('actions.upload.uploadFiles')}</p>
-                  </MenuItem>,
-                  <MenuItem onClick={onUploadFolderButtonClicked}>
+                    <p>{i18n.get('actions.upload.uploadFiles')}</p>
+                  </div>,
+                  <div className="flex flex-row items-center space-x-3 py-2 px-3" onClick={onUploadFolderButtonClicked}>
                     <UploadSimple size={20} />
-                    <p className="ml-3">{i18n.get('actions.upload.uploadFolder')}</p>
-                  </MenuItem>,
+                    <p>{i18n.get('actions.upload.uploadFolder')}</p>
+                  </div>,
                 ]}
               >
                 <>
