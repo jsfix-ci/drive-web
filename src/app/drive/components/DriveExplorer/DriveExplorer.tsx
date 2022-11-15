@@ -264,7 +264,7 @@ const DriveExplorer = (props: DriveExplorerProps): JSX.Element => {
       <DeleteItemsDialog onItemsDeleted={onItemsDeleted} />
       <CreateFolderDialog onFolderCreated={onFolderCreated} currentFolderId={currentFolderId} />
       <MoveItemsDialog items={items} onItemsMoved={onItemsMoved} isTrash={isTrash} />
-      <ClearTrashDialog onItemsDeleted={onItemsDeleted} />
+      <ClearTrashDialog onItemsDeleted={onItemsDeleted} items={items} />
 
       <div className="z-0 flex h-full w-full max-w-full flex-grow">
         <div className="flex w-1 flex-grow flex-col pt-6">

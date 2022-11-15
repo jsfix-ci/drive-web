@@ -143,6 +143,22 @@ export function trackPlanSubscriptionSelected(payload: {
   // window.analytics.track(AnalyticsTrack.PlanSubscriptionSelected, payload);
 }
 
+export function trackFileSharedLinkCopied(name: string, size: number): void {
+  window.rudderanalytics.track('Shared Link Copied', {
+    name: name,
+    size: size,
+  });
+}
+
+export function trackFileDeleted(size: number, type: string, file_id: number, parent_folder_id: number): void {
+  window.rudderanalytics.track('File deleted', {
+    size: size,
+    type: type,
+    file_id: file_id,
+    parent_folder_id: parent_folder_id,
+  });
+}
+
 export function trackFolderCreated(payload: { email: string; platform: DevicePlatform }): void {
   // window.analytics.track(AnalyticsTrack.FolderCreated, payload);
 }
@@ -274,7 +290,7 @@ export async function trackPaymentConversion() {
   try {
     // window.analytics.page('Checkout Success');
     const checkoutSessionId = localStorage.getItem('sessionId');
-    const { metadata, amount_total, currency, customer, subscription, payment_intent } = await httpService.get(
+    const { metadata, amount_total, currency, customer, subscription, payment_intent }: any = await httpService.get(
       `${process.env.REACT_APP_API_URL}/api/stripe/session`,
       {
         params: {
@@ -406,6 +422,7 @@ const analyticsService = {
   trackSignOut,
   trackSignIn,
   trackSignUp,
+  trackFileSharedLinkCopied,
   trackUserEnterPayments,
   trackPlanSubscriptionSelected,
   trackFolderCreated,
@@ -417,6 +434,7 @@ const analyticsService = {
   trackFileUploadStart,
   trackFileUploadError,
   trackFileUploadFinished,
+  trackFileDeleted,
   trackMoveItem,
   trackDeleteItem,
   trackOpenWelcomeFile,

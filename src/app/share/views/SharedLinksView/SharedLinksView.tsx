@@ -22,12 +22,16 @@ import sizeService from 'app/drive/services/size.service';
 import { useAppDispatch } from 'app/store/hooks';
 import { storageActions } from 'app/store/slices/storage';
 import { uiActions } from 'app/store/slices/ui';
+import analyticsService from 'app/analytics/services/analytics.service';
 
 type OrderBy = { field: 'views' | 'createdAt'; direction: 'ASC' | 'DESC' } | undefined;
 
-function copyShareLink(type: string, code: string, token: string) {
+function copyShareLink(type: string, code: string, token: string, item) {
   copy(`${document.location.origin}/s/${type}/${token}/${code}`);
   notificationsService.show({ text: i18n.get('shared-links.toast.copy-to-clipboard'), type: ToastType.Success });
+  if (!item.isFolder) {
+    analyticsService.trackFileSharedLinkCopied(item.name + '.' + item.type, item.size);
+  }
 }
 
 export default function SharedLinksView(): JSX.Element {
@@ -56,6 +60,7 @@ export default function SharedLinksView(): JSX.Element {
 
   useEffect(() => {
     fetchItems(page, orderBy, 'append');
+    console.log(shareLinks);
   }, []);
 
   async function fetchItems(page: number, orderBy: OrderBy, type: 'append' | 'substitute') {
@@ -279,7 +284,8 @@ export default function SharedLinksView(): JSX.Element {
                 const itemType = props.isFolder ? 'folder' : 'file';
                 const encryptedCode = props.code || props.encryptedCode;
                 const plainCode = aes.decrypt(encryptedCode, localStorageService.getUser()!.mnemonic);
-                copyShareLink(itemType, plainCode, props.token);
+                copyShareLink(itemType, plainCode, props.token, props.item);
+                console.log(props);
               },
               disabled: () => {
                 return false;
