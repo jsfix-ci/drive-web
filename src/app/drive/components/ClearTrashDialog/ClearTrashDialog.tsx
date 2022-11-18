@@ -7,10 +7,7 @@ import { RootState } from 'app/store';
 import i18n from 'app/i18n/services/i18n.service';
 import clearTrash from '../../../../use_cases/trash/clear-trash';
 import Button from 'app/shared/components/Button/Button';
-import analyticsService from 'app/analytics/services/analytics.service';
 import { DriveItemData } from 'app/drive/types';
-import { SdkFactory } from 'app/core/factory/sdk';
-import _ from 'lodash';
 
 interface ClearTrashDialogProps {
   onItemsDeleted?: () => void;
@@ -35,18 +32,13 @@ const ClearTrashDialog = (props: ClearTrashDialogProps): JSX.Element => {
 
       setIsLoading(false);
       onClose();
-      props.items?.map((item) => {
-        getFolderSize(item.id).then((size) => {
-          console.log(size);
-        });
-        if (item.isFolder === true) {
-          window.rudderanalytics.track('Folder deleted', {
-            size: 0,
-          });
-        } else {
-          analyticsService.trackFileDeleted(item.size, item.type, item.id, item.parentId);
-        }
-      });
+      // props.items?.forEach(async (item) => {
+      //   if (item.isFolder) {
+      //     analyticsService.trackFolderDeleted();
+      //   } else {
+      //     analyticsService.trackFileDeleted(item.size, item.type, item.id, item.folderId);
+      //   }
+      // });
     } catch (err: unknown) {
       const castedError = errorService.castError(err);
 
@@ -55,21 +47,6 @@ const ClearTrashDialog = (props: ClearTrashDialogProps): JSX.Element => {
       console.log(castedError.message);
     }
   };
-
-  async function getFolderSize(folderId) {
-    let size = 0;
-    const storageClient = SdkFactory.getInstance().createStorageClient();
-    const [responsePromise] = storageClient.getFolderContent(folderId);
-    const response = await responsePromise;
-    const folders = response.children.map((folder) => ({ ...folder, isFolder: true }));
-    const items = _.concat(folders as DriveItemData[], response.files as DriveItemData[]);
-    console.log('Items in Folder ', items);
-    items.map((item) => {
-      size += item.size;
-    });
-
-    return size;
-  }
 
   return (
     <BaseDialog

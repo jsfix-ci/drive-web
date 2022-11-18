@@ -15,7 +15,7 @@ import notificationsService, { ToastType } from 'app/notifications/services/noti
 import { ShareTypes } from '@internxt/sdk/dist/drive';
 import _ from 'lodash';
 import { ListShareLinksItem } from '@internxt/sdk/dist/drive/share/types';
-import { DriveFileData } from '../../../drive/types';
+import { DriveFileData, DriveItemData } from '../../../drive/types';
 import { aes } from '@internxt/lib';
 import localStorageService from 'app/core/services/local-storage.service';
 import sizeService from 'app/drive/services/size.service';
@@ -23,14 +23,19 @@ import { useAppDispatch } from 'app/store/hooks';
 import { storageActions } from 'app/store/slices/storage';
 import { uiActions } from 'app/store/slices/ui';
 import analyticsService from 'app/analytics/services/analytics.service';
+import storageService from 'app/drive/services/storage.service';
+import { SdkFactory } from 'app/core/factory/sdk';
+import * as prettySize from 'prettysize';
 
 type OrderBy = { field: 'views' | 'createdAt'; direction: 'ASC' | 'DESC' } | undefined;
 
-function copyShareLink(type: string, code: string, token: string, item) {
+function copyShareLink(type: string, code: string, token: string, item: DriveItemData) {
   copy(`${document.location.origin}/s/${type}/${token}/${code}`);
   notificationsService.show({ text: i18n.get('shared-links.toast.copy-to-clipboard'), type: ToastType.Success });
-  if (!item.isFolder) {
-    analyticsService.trackFileSharedLinkCopied(item.name + '.' + item.type, item.size);
+  if (type === 'folder') {
+    analyticsService.trackFolderSharedLinkCopied(item.name, item.id);
+  } else {
+    analyticsService.trackFileSharedLinkCopied(item.name + '.' + item.type, item.size, 1);
   }
 }
 
@@ -60,7 +65,6 @@ export default function SharedLinksView(): JSX.Element {
 
   useEffect(() => {
     fetchItems(page, orderBy, 'append');
-    console.log(shareLinks);
   }, []);
 
   async function fetchItems(page: number, orderBy: OrderBy, type: 'append' | 'substitute') {
@@ -101,10 +105,16 @@ export default function SharedLinksView(): JSX.Element {
     fetchItems(0, newOrderBy, 'substitute');
   }
 
-  async function deleteShareLink(shareId: string) {
+  async function deleteShareLink(item) {
     //setShareLinks((items) => items.filter((item) => item.id !== shareId));
     //setSelectedItems((items) => items.filter((item) => item.id !== shareId));
-    return await shareService.deleteShareLink(shareId);
+    console.log('deleteShareLink', item);
+    if (item.isFolder) {
+      analyticsService.trackFolderSharedLinkDeleted(item.item?.name, item.id);
+    } else {
+      analyticsService.trackFileSharedLinkDeleted(item.item?.name + '.' + item.item?.type, item.item?.size, 1);
+    }
+    return await shareService.deleteShareLink(item.id);
     //TODO check if its deleted correctly
   }
 
@@ -115,7 +125,7 @@ export default function SharedLinksView(): JSX.Element {
       const CHUNK_SIZE = 10;
       const chunks = _.chunk(selectedItems, CHUNK_SIZE);
       for (const chunk of chunks) {
-        const promises = chunk.map((item) => deleteShareLink(item.id));
+        const promises = chunk.map((item) => deleteShareLink(item));
         await Promise.all(promises);
       }
 
@@ -285,7 +295,6 @@ export default function SharedLinksView(): JSX.Element {
                 const encryptedCode = props.code || props.encryptedCode;
                 const plainCode = aes.decrypt(encryptedCode, localStorageService.getUser()!.mnemonic);
                 copyShareLink(itemType, plainCode, props.token, props.item);
-                console.log(props);
               },
               disabled: () => {
                 return false;

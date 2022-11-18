@@ -1,5 +1,14 @@
 import React, { MouseEvent, ReactNode } from 'react';
-import { PencilSimple, Trash, DownloadSimple, Copy, Link, Gear, LinkBreak, ClockCounterClockwise } from 'phosphor-react';
+import {
+  PencilSimple,
+  Trash,
+  DownloadSimple,
+  Copy,
+  Link,
+  Gear,
+  LinkBreak,
+  ClockCounterClockwise,
+} from 'phosphor-react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { DriveItemAction } from '../DriveExplorer/DriveExplorerItem';
 
@@ -123,7 +132,7 @@ class FileDropdownActions extends React.Component<FileDropdownActionsProps> {
         ) : null}
         {!hiddenActions.includes(DriveItemAction.Info) && this.props.isTrash ? (
           <Dropdown.Item id="recover" onClick={this.onRecoverButtonClicked}>
-            <ClockCounterClockwise className="text-blue-60 h-5 mr-1" />
+            <ClockCounterClockwise className="mr-1 h-5 text-blue-60" />
             <span>Restore</span>
           </Dropdown.Item>
         ) : null}
@@ -151,8 +160,12 @@ class FileDropdownActions extends React.Component<FileDropdownActionsProps> {
         ) : null}
         <hr className="my-1.5 text-neutral-30"></hr>
         {!hiddenActions.includes(DriveItemAction.Delete) ? (
-          <Dropdown.Item id="delete" className={`${!this.props.isTrash ? 'text-red-60 hover:text-red-60' : ''}`} onClick={!this.props.isTrash ? this.onDeleteButtonClicked : this.onDeletePermanentlyButtonClicked}>
-            <Trash className={`h-5 w-5 mr-1 ${this.props.isTrash ? 'text-blue-60' : ''}`} />
+          <Dropdown.Item
+            id="delete"
+            className={`${!this.props.isTrash ? 'text-red-60 hover:text-red-60' : ''}`}
+            onClick={!this.props.isTrash ? this.onDeleteButtonClicked : this.onDeletePermanentlyButtonClicked}
+          >
+            <Trash className={`mr-1 h-5 w-5 ${this.props.isTrash ? 'text-blue-60' : ''}`} />
             <span>{this.props.isTrash ? 'Delete permanently' : 'Move to trash'}</span>
           </Dropdown.Item>
         ) : null}

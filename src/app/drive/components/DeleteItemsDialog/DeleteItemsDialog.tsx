@@ -10,6 +10,7 @@ import { DriveItemData } from '../../types';
 import i18n from 'app/i18n/services/i18n.service';
 import deleteItems from '../../../../use_cases/trash/delete-items';
 import Button from 'app/shared/components/Button/Button';
+import analyticsService from 'app/analytics/services/analytics.service';
 
 interface DeleteItemsDialogProps {
   onItemsDeleted?: () => void;
@@ -34,7 +35,13 @@ const DeleteItemsDialog = (props: DeleteItemsDialogProps): JSX.Element => {
       }
 
       props.onItemsDeleted && props.onItemsDeleted();
-
+      itemsToDelete.forEach(async (item) => {
+        if (item.isFolder) {
+          analyticsService.trackFolderDeleted();
+        } else {
+          analyticsService.trackFileDeleted(item.size, item.type, item.id, item.folderId);
+        }
+      });
       setIsLoading(false);
       onClose();
     } catch (err: unknown) {

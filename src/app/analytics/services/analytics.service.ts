@@ -143,10 +143,31 @@ export function trackPlanSubscriptionSelected(payload: {
   // window.analytics.track(AnalyticsTrack.PlanSubscriptionSelected, payload);
 }
 
-export function trackFileSharedLinkCopied(name: string, size: number): void {
+export function trackFileSharedLinkCopied(name: string, size: number, count: number): void {
   window.rudderanalytics.track('Shared Link Copied', {
     name: name,
     size: size,
+    number_of_items: count,
+  });
+}
+
+export function trackFileSharedLinkDeleted(name: string, size: number, count: number): void {
+  window.rudderanalytics.track('Shared Link Deleted', {
+    name: name,
+    size: size,
+    number_of_items: count,
+  });
+}
+export function trackFolderSharedLinkCopied(name: string, fileId: number): void {
+  window.rudderanalytics.track('Shared Link Copied', {
+    name: name,
+    fileId: fileId,
+  });
+}
+export function trackFolderSharedLinkDeleted(name: string, fileId: number): void {
+  window.rudderanalytics.track('Shared Link Deleted', {
+    name: name,
+    fileId: fileId,
   });
 }
 
@@ -156,7 +177,12 @@ export function trackFileDeleted(size: number, type: string, file_id: number, pa
     type: type,
     file_id: file_id,
     parent_folder_id: parent_folder_id,
+    number_of_items_below: 1,
   });
+}
+
+export function trackFolderDeleted(): void {
+  window.rudderanalytics.track('Folder deleted');
 }
 
 export function trackFolderCreated(payload: { email: string; platform: DevicePlatform }): void {
@@ -423,6 +449,9 @@ const analyticsService = {
   trackSignIn,
   trackSignUp,
   trackFileSharedLinkCopied,
+  trackFolderSharedLinkCopied,
+  trackFileSharedLinkDeleted,
+  trackFolderSharedLinkDeleted,
   trackUserEnterPayments,
   trackPlanSubscriptionSelected,
   trackFolderCreated,
@@ -435,6 +464,7 @@ const analyticsService = {
   trackFileUploadError,
   trackFileUploadFinished,
   trackFileDeleted,
+  trackFolderDeleted,
   trackMoveItem,
   trackDeleteItem,
   trackOpenWelcomeFile,
