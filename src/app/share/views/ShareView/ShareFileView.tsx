@@ -26,6 +26,7 @@ import { ShareTypes } from '@internxt/sdk/dist/drive';
 import { UserSettings } from '@internxt/sdk/dist/shared/types/userSettings';
 import { binaryStreamToBlob } from 'app/core/services/stream.service';
 import ShareItemPwdView from './ShareItemPwdView';
+import analyticsService from 'app/analytics/services/analytics.service';
 
 export interface ShareViewProps extends ShareViewState {
   match: match<{
@@ -199,6 +200,7 @@ export default function ShareFileView(props: ShareViewProps): JSX.Element {
         const fileBlob = await binaryStreamToBlob(readable);
 
         downloadService.downloadFileFromBlob(fileBlob, getFormatFileName());
+        analyticsService.trackFileSharedLinkDownloaded(fileInfo.item?.name, fileInfo.item?.type, 1);
       }
     }
   };

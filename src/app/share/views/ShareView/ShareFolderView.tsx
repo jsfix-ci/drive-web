@@ -22,6 +22,7 @@ import { loadWritableStreamPonyfill } from 'app/network/download';
 import ShareItemPwdView from './ShareItemPwdView';
 import notificationsService, { ToastType } from 'app/notifications/services/notifications.service';
 import errorService from 'app/core/services/error.service';
+import analyticsService from 'app/analytics/services/analytics.service';
 
 interface ShareViewProps extends ShareViewState {
   match: match<{
@@ -169,6 +170,8 @@ export default function ShareFolderView(props: ShareViewProps): JSX.Element {
           .then(() => {
             updateProgress(1);
             shareService.incrementShareView(folderInfo.token);
+            console.log(folderInfo);
+            analyticsService.trackFolderSharedLinkDownloaded(folderInfo.item.name, folderInfo.item?.id);
           })
           .catch((err) => {
             if (err && err.message && err.message.includes('user aborted')) {

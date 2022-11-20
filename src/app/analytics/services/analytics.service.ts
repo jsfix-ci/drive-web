@@ -158,6 +158,15 @@ export function trackFileSharedLinkDeleted(name: string, size: number, count: nu
     number_of_items: count,
   });
 }
+
+export function trackFileSharedLinkDownloaded(name: string, size: number, count: number): void {
+  window.rudderanalytics.track('Shared Link Downloaded', {
+    name: name,
+    size: size,
+    number_of_items: count,
+  });
+}
+
 export function trackFolderSharedLinkCopied(name: string, fileId: number): void {
   window.rudderanalytics.track('Shared Link Copied', {
     name: name,
@@ -166,6 +175,13 @@ export function trackFolderSharedLinkCopied(name: string, fileId: number): void 
 }
 export function trackFolderSharedLinkDeleted(name: string, fileId: number): void {
   window.rudderanalytics.track('Shared Link Deleted', {
+    name: name,
+    fileId: fileId,
+  });
+}
+
+export function trackFolderSharedLinkDownloaded(name: string, fileId: number): void {
+  window.rudderanalytics.track('Shared Link Downloaded', {
     name: name,
     fileId: fileId,
   });
@@ -452,6 +468,8 @@ const analyticsService = {
   trackFolderSharedLinkCopied,
   trackFileSharedLinkDeleted,
   trackFolderSharedLinkDeleted,
+  trackFileSharedLinkDownloaded,
+  trackFolderSharedLinkDownloaded,
   trackUserEnterPayments,
   trackPlanSubscriptionSelected,
   trackFolderCreated,
