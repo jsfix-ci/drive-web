@@ -5,7 +5,7 @@ import { RootState } from '../..';
 import { ListShareLinksItem, ListShareLinksResponse, ShareLink } from '@internxt/sdk/dist/drive/share/types';
 import navigationService from 'app/core/services/navigation.service';
 import { AppView } from 'app/core/types';
-import { trackShareLinkBucketIdUndefined } from 'app/analytics/services/analytics.service';
+import analyticsService, { trackShareLinkBucketIdUndefined } from 'app/analytics/services/analytics.service';
 import notificationsService, { ToastType } from 'app/notifications/services/notifications.service';
 import { userThunks } from '../user';
 import i18n from 'app/i18n/services/i18n.service';
@@ -114,6 +114,11 @@ const getSharedLinkThunk = createAsyncThunk<string | void, GetLinkPayload, { sta
           },
         }),
       );
+      if (item.isFolder) {
+        analyticsService.trackFolderSharedLinkCopied(item.name, item.id);
+      } else {
+        analyticsService.trackFileSharedLinkCopied(item.name, item.size, 1);
+      }
 
       return link;
     } catch (err: unknown) {
@@ -152,6 +157,11 @@ export const deleteLinkThunk = createAsyncThunk<void, DeleteLinkPayload, { state
 
     const stringLinksDeleted = i18n.get('shared-links.toast.link-deleted');
     notificationsService.show({ text: stringLinksDeleted, type: ToastType.Success });
+    if (item.isFolder) {
+      analyticsService.trackFolderSharedLinkDeleted(item.name, item.id);
+    } else {
+      analyticsService.trackFileSharedLinkDeleted(item.name, item.size, 1);
+    }
   },
 );
 
