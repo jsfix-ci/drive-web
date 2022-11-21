@@ -23,10 +23,6 @@ export const PATH_NAMES = {
   '/app': 'App',
 };
 
-export function trackFileDownloadCompleted(properties): void {
-  trackData(properties, 'file_downloaded');
-}
-
 function trackData(properties, actionName) {
   const user = localStorageService.getUser();
   httpService.post(`${process.env.REACT_APP_API_URL}/api/data`, {
@@ -213,34 +209,28 @@ export function trackFileRename(payload: { email: string; file_id: number | stri
   // window.analytics.track(AnalyticsTrack.FileRename, payload);
 }
 
-export function trackFileDownloadStart(payload: {
-  file_id: string;
-  file_name: string;
-  file_size: number;
-  file_type: string;
-  email: string;
-  folder_id: number;
-  platform: DevicePlatform;
-}): void {
-  // window.analytics.track(AnalyticsTrack.FileDownloadStart, payload);
+export function trackFileDownloadStart(properties): void {
+  window.rudderanalytics.track('File Download Started', properties);
 }
 
-export function trackFileDownloadError(payload: {
-  file_id: string;
-  email: string;
-  msg: string;
-  platform: DevicePlatform;
-}): void {
-  // window.analytics.track(AnalyticsTrack.FileDownloadError, payload);
+export function trackFileDownloadError(properties): void {
+  window.rudderanalytics.track('File Download Error', properties);
 }
 
-export function trackFileDownloadFinished(payload: {
-  file_id: string;
-  file_size: number;
-  email: string;
-  platform: DevicePlatform;
-}): void {
-  // window.analytics.track(AnalyticsTrack.FileDownloadFinished, payload);
+export function trackFileDownloadCompleted(properties): void {
+  window.rudderanalytics.track('File Download Finished', properties);
+}
+
+export function trackFolderDownloadStart(properties): void {
+  window.rudderanalytics.track('Folder Download Started', properties);
+}
+
+export function trackFolderDownloadError(properties): void {
+  window.rudderanalytics.track('Folder Download Error', properties);
+}
+
+export function trackFolderDownloadCompleted(properties): void {
+  window.rudderanalytics.track('Folder Download Finished', properties);
 }
 
 export function trackFileUploadStart(payload: {
@@ -477,10 +467,12 @@ const analyticsService = {
   trackFileRename,
   trackFileDownloadStart,
   trackFileDownloadError,
-  trackFileDownloadFinished,
+  trackFileUploadFinished,
+  trackFolderDownloadStart,
+  trackFolderDownloadError,
+  trackFolderDownloadCompleted,
   trackFileUploadStart,
   trackFileUploadError,
-  trackFileUploadFinished,
   trackFileDeleted,
   trackFolderDeleted,
   trackMoveItem,

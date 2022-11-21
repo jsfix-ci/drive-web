@@ -8,6 +8,7 @@ import i18n from 'app/i18n/services/i18n.service';
 import notificationsService, { ToastType } from 'app/notifications/services/notifications.service';
 import { DownloadFileTask, DownloadFolderTask, TaskType } from 'app/tasks/types';
 import tasksService from 'app/tasks/services/tasks.service';
+import analyticsService from 'app/analytics/services/analytics.service';
 
 export const downloadItemsThunk = createAsyncThunk<void, DriveItemData[], { state: RootState }>(
   'storage/downloadItems',
@@ -60,6 +61,7 @@ export const downloadItemsThunk = createAsyncThunk<void, DriveItemData[], { stat
             options: { taskId },
           }),
         );
+        //
       }
     }
 

@@ -23,9 +23,6 @@ import { useAppDispatch } from 'app/store/hooks';
 import { storageActions } from 'app/store/slices/storage';
 import { uiActions } from 'app/store/slices/ui';
 import analyticsService from 'app/analytics/services/analytics.service';
-import storageService from 'app/drive/services/storage.service';
-import { SdkFactory } from 'app/core/factory/sdk';
-import * as prettySize from 'prettysize';
 
 type OrderBy = { field: 'views' | 'createdAt'; direction: 'ASC' | 'DESC' } | undefined;
 

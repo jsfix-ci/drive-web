@@ -11,6 +11,7 @@ import i18n from 'app/i18n/services/i18n.service';
 import errorService from 'app/core/services/error.service';
 import { TaskStatus } from 'app/tasks/types';
 import notificationsService, { ToastType } from 'app/notifications/services/notifications.service';
+import analyticsService from 'app/analytics/services/analytics.service';
 
 interface DownloadFileThunkOptions {
   taskId: string;
@@ -59,7 +60,7 @@ export const downloadFileThunk = createAsyncThunk<void, DownloadFileThunkPayload
         taskId: options.taskId,
         merge: {
           status: TaskStatus.Decrypting,
-          stop: async () => (abortController as { abort: (reason?: string) => void }).abort('Download cancelled')
+          stop: async () => (abortController as { abort: (reason?: string) => void }).abort('Download cancelled'),
         },
       });
 
@@ -89,7 +90,6 @@ export const downloadFileThunk = createAsyncThunk<void, DownloadFileThunkPayload
           status: TaskStatus.Error,
         },
       });
-
       rejectWithValue(castedError);
     }
   },

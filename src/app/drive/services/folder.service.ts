@@ -65,23 +65,19 @@ export interface FetchFolderContentResponse {
   user_id: number;
 }
 
-
 export function createFolder(
   currentFolderId: number,
   folderName: string,
-): [
-    Promise<StorageTypes.CreateFolderResponse>,
-    RequestCanceler
-  ] {
+): [Promise<StorageTypes.CreateFolderResponse>, RequestCanceler] {
   const payload: StorageTypes.CreateFolderPayload = {
     parentFolderId: currentFolderId,
-    folderName: folderName
+    folderName: folderName,
   };
   const storageClient = SdkFactory.getInstance().createStorageClient();
   const [createdFolderPromise, requestCanceler] = storageClient.createFolder(payload);
 
   const finalPromise = createdFolderPromise
-    .then(response => {
+    .then((response) => {
       const user = localStorageService.getUser() as UserSettings;
       analyticsService.trackFolderCreated({
         email: user.email,
@@ -89,7 +85,7 @@ export function createFolder(
       });
       return response;
     })
-    .catch(error => {
+    .catch((error) => {
       throw errorService.castError(error);
     });
 
@@ -152,8 +148,8 @@ class DirectoryFolderIterator implements Iterator<DriveFolderData> {
 }
 
 interface GetDirectoryFilesResponse {
-  files: DriveFileData[],
-  last: boolean
+  files: DriveFileData[];
+  last: boolean;
 }
 class DirectoryFilesIterator implements Iterator<DriveFileData> {
   private offset: number;
@@ -169,7 +165,7 @@ class DirectoryFilesIterator implements Iterator<DriveFileData> {
   async next() {
     const { directoryId } = this.queryValues;
     const { files, last } = await httpService.get<GetDirectoryFilesResponse>(
-      `/api/storage/v2/folders/${directoryId}/files?limit=${this.limit}&offset=${this.offset}`
+      `/api/storage/v2/folders/${directoryId}/files?limit=${this.limit}&offset=${this.offset}`,
     );
 
     this.offset += this.limit;
@@ -179,15 +175,15 @@ class DirectoryFilesIterator implements Iterator<DriveFileData> {
 }
 
 interface FolderRef {
-  name: string
-  folderId: number
+  name: string;
+  folderId: number;
 }
 
 async function addAllFilesToZip(
   currentAbsolutePath: string,
   downloadFile: (file: DriveFileData) => Promise<ReadableStream>,
   iterator: Iterator<DriveFileData>,
-  zip: FlatFolderZip
+  zip: FlatFolderZip,
 ): Promise<DriveFileData[]> {
   let pack = await iterator.next();
   let files = pack.value;
@@ -217,7 +213,7 @@ async function addAllFilesToZip(
 async function addAllFoldersToZip(
   currentAbsolutePath: string,
   iterator: Iterator<DriveFolderData>,
-  zip: FlatFolderZip
+  zip: FlatFolderZip,
 ): Promise<DriveFolderData[]> {
   let pack = await iterator.next();
   let folders = pack.value;
@@ -246,24 +242,22 @@ async function addAllFoldersToZip(
 async function downloadFolderAsZip(
   folderId: DriveFolderData['id'],
   folderName: DriveFolderData['name'],
-  updateProgress: (progress: number) => void
+  updateProgress: (progress: number) => void,
 ): Promise<void> {
   const rootFolder: FolderRef = { folderId: folderId, name: folderName };
   const pendingFolders: FolderRef[] = [rootFolder];
   let totalSize = 0;
+  let count = 0;
   let totalSizeIsReady = false;
 
-  const zip = new FlatFolderZip(
-    rootFolder.name,
-    {
-      progress(loadedBytes) {
-        if (!totalSizeIsReady) {
-          return;
-        }
-        updateProgress(Math.min(loadedBytes / totalSize, 1));
-      },
-    }
-  );
+  const zip = new FlatFolderZip(rootFolder.name, {
+    progress(loadedBytes) {
+      if (!totalSizeIsReady) {
+        return;
+      }
+      updateProgress(Math.min(loadedBytes / totalSize, 1));
+    },
+  });
 
   const user = localStorageService.getUser();
 
@@ -272,13 +266,23 @@ async function downloadFolderAsZip(
   }
 
   try {
+    analyticsService.trackFolderDownloadStart({
+      folder_id: folderId,
+      size: totalSize,
+    });
     do {
       const folderToDownload = pendingFolders.shift() as FolderRef;
 
-      const foldersIterator: Iterator<DriveFolderData> =
-        new DirectoryFolderIterator({ directoryId: folderToDownload.folderId }, 20, 0);
-      const filesIterator: Iterator<DriveFileData> =
-        new DirectoryFilesIterator({ directoryId: folderToDownload.folderId }, 20, 0);
+      const foldersIterator: Iterator<DriveFolderData> = new DirectoryFolderIterator(
+        { directoryId: folderToDownload.folderId },
+        20,
+        0,
+      );
+      const filesIterator: Iterator<DriveFileData> = new DirectoryFilesIterator(
+        { directoryId: folderToDownload.folderId },
+        20,
+        0,
+      );
 
       const files = await addAllFilesToZip(
         folderToDownload.name,
@@ -288,38 +292,49 @@ async function downloadFolderAsZip(
             fileId: file.fileId,
             creds: {
               user: user.bridgeUser,
-              pass: user.userId
+              pass: user.userId,
             },
             mnemonic: user.mnemonic,
           });
         },
         filesIterator,
-        zip
+        zip,
       );
 
-      totalSize += files.reduce((a, f) => f.size + a, 0);
+      count += files.length;
 
-      const folders = await addAllFoldersToZip(
-        folderToDownload.name,
-        foldersIterator,
-        zip
-      );
+      files.forEach((file) => {
+        totalSize += +file.size;
+      });
+
+      const folders = await addAllFoldersToZip(folderToDownload.name, foldersIterator, zip);
 
       pendingFolders.push(
-        ...folders.map(f => {
+        ...folders.map((f) => {
           return {
             name: folderToDownload.name + '/' + f.name,
-            folderId: f.id
+            folderId: f.id,
           };
-        })
+        }),
       );
     } while (pendingFolders.length > 0);
 
     totalSizeIsReady = true;
 
+    analyticsService.trackFolderDownloadCompleted({
+      folder_id: folderId,
+      size: totalSize,
+      number_of_items: count,
+    });
+
     await zip.close();
   } catch (err) {
     zip.abort();
+    analyticsService.trackFolderDownloadError({
+      folder_id: folderId,
+      size: totalSize,
+      number_of_items: count,
+    });
     throw errorService.castError(err);
   }
 }
@@ -361,17 +376,16 @@ async function fetchFolderTree(folderId: number): Promise<{
   return { tree, folderDecryptedNames, fileDecryptedNames, size };
 }
 
-export async function moveFolder(
-  folderId: number, destination: number
-): Promise<StorageTypes.MoveFolderResponse> {
+export async function moveFolder(folderId: number, destination: number): Promise<StorageTypes.MoveFolderResponse> {
   const storageClient = SdkFactory.getInstance().createStorageClient();
   const payload: StorageTypes.MoveFolderPayload = {
     folderId: folderId,
-    destinationFolderId: destination
+    destinationFolderId: destination,
   };
 
-  return storageClient.moveFolder(payload)
-    .then(response => {
+  return storageClient
+    .moveFolder(payload)
+    .then((response) => {
       const user = localStorageService.getUser() as UserSettings;
       analyticsService.trackMoveItem('folder', {
         file_id: response.item.id,

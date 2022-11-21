@@ -2,30 +2,10 @@ import streamSaver from 'streamsaver';
 
 import analyticsService from 'app/analytics/services/analytics.service';
 import localStorageService from 'app/core/services/local-storage.service';
-import { DevicePlatform } from 'app/core/types';
 import { DriveFileData } from '../../types';
 import downloadFileFromBlob from './downloadFileFromBlob';
 import fetchFileStream from './fetchFileStream';
 import { loadWritableStreamPonyfill } from 'app/network/download';
-
-const trackFileDownloadStart = (
-  userEmail: string,
-  file_id: string,
-  file_name: string,
-  file_size: number,
-  file_type: string,
-  folder_id: number,
-) => {
-  const data = { file_id, file_name, file_size, file_type, email: userEmail, folder_id, platform: DevicePlatform.Web };
-
-  analyticsService.trackFileDownloadStart(data);
-};
-
-const trackFileDownloadError = (userEmail: string, file_id: string, msg: string) => {
-  const data = { file_id, email: userEmail, msg, platform: DevicePlatform.Web };
-
-  analyticsService.trackFileDownloadError(data);
-};
 
 interface BlobWritable {
   getWriter: () => {
@@ -124,24 +104,36 @@ export default async function downloadFile(
     support = DownloadSupport.PatchedStreamApi;
   }
 
-  trackFileDownloadStart(userEmail, fileId, itemData.name, itemData.size, itemData.type, itemData.folderId);
-
   const fileStreamPromise = fetchFileStream(
     { ...itemData, bucketId: itemData.bucket },
     { isTeam, updateProgressCallback, abortController },
   );
 
+  analyticsService.trackFileDownloadStart({
+    fileId: itemData.id,
+    folderId: itemData.folderId,
+    size: Number(itemData.size),
+    type: itemData.type,
+  });
+
   await downloadToFs(completeFilename, fileStreamPromise, support, abortController).catch((err) => {
     const errMessage = err instanceof Error ? err.message : (err as string);
 
-    trackFileDownloadError(userEmail, fileId, errMessage);
+    analyticsService.trackFileDownloadError({
+      fileId: itemData.id,
+      folderId: itemData.folderId,
+      size: Number(itemData.size),
+      type: itemData.type,
+    });
 
     throw new Error(errMessage);
   });
 
   analyticsService.trackFileDownloadCompleted({
-    size: itemData.size,
-    extension: itemData.type,
+    fileId: itemData.id,
+    folderId: itemData.folderId,
+    size: Number(itemData.size),
+    type: itemData.type,
   });
 }
 
