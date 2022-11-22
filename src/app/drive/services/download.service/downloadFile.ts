@@ -119,13 +119,6 @@ export default async function downloadFile(
   await downloadToFs(completeFilename, fileStreamPromise, support, abortController).catch((err) => {
     const errMessage = err instanceof Error ? err.message : (err as string);
 
-    analyticsService.trackFileDownloadError({
-      fileId: itemData.id,
-      folderId: itemData.folderId,
-      size: Number(itemData.size),
-      type: itemData.type,
-    });
-
     throw new Error(errMessage);
   });
 

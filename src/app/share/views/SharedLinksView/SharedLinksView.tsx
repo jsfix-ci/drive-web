@@ -105,7 +105,7 @@ export default function SharedLinksView(): JSX.Element {
   async function deleteShareLink(item) {
     //setShareLinks((items) => items.filter((item) => item.id !== shareId));
     //setSelectedItems((items) => items.filter((item) => item.id !== shareId));
-    console.log('deleteShareLink', item);
+
     if (item.isFolder) {
       analyticsService.trackFolderSharedLinkDeleted(item.item?.name, item.id);
     } else {

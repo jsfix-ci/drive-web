@@ -25,7 +25,7 @@ export async function uploadFile(
   file: FileToUpload,
   isTeam: boolean,
   updateProgressCallback: (progress: number) => void,
-  abortController?: AbortController
+  abortController?: AbortController,
 ): Promise<DriveFileData> {
   const { bridgeUser, bridgePass, encryptionKey, bucketId } = getEnvironmentConfig(isTeam);
 
@@ -50,7 +50,7 @@ export async function uploadFile(
     const fileId = await uploadToBucket(bucketId, {
       creds: {
         pass: bridgePass,
-        user: bridgeUser
+        user: bridgeUser,
       },
       filecontent: file.content,
       filesize: file.size,
@@ -58,7 +58,7 @@ export async function uploadFile(
       progressCallback: (totalBytes, uploadedBytes) => {
         updateProgressCallback(uploadedBytes / totalBytes);
       },
-      abortController
+      abortController,
     });
 
     const name = encryptFilename(file.name, file.parentFolderId);
@@ -71,14 +71,14 @@ export async function uploadFile(
       bucket: bucketId,
       folder_id: file.parentFolderId,
       encrypt_version: StorageTypes.EncryptionVersion.Aes03,
-      plain_name: file.name
+      plain_name: file.name,
     };
 
     let response = await storageClient.createFileEntry(fileEntry);
     if (!response.thumbnails) {
       response = {
         ...response,
-        thumbnails: []
+        thumbnails: [],
       };
     }
 
@@ -102,7 +102,7 @@ export async function uploadFile(
   } catch (err: unknown) {
     const castedError = errorService.castError(err);
 
-    if (!abortController?.signal.aborted) {
+    if (abortController?.signal.aborted) {
       analyticsService.trackFileUploadError({
         file_size: file.size,
         file_type: file.type,

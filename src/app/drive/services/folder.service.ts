@@ -268,7 +268,6 @@ async function downloadFolderAsZip(
   try {
     analyticsService.trackFolderDownloadStart({
       folder_id: folderId,
-      size: totalSize,
     });
     do {
       const folderToDownload = pendingFolders.shift() as FolderRef;

@@ -74,6 +74,12 @@ export const downloadFileThunk = createAsyncThunk<void, DownloadFileThunkPayload
       });
     } catch (err) {
       if (abortController.signal.aborted) {
+        analyticsService.trackFileDownloadCancelled({
+          fileId: file.id,
+          folderId: file.folderId,
+          size: Number(file.size),
+          type: file.type,
+        });
         return tasksService.updateTask({
           taskId: options.taskId,
           merge: {
@@ -89,6 +95,12 @@ export const downloadFileThunk = createAsyncThunk<void, DownloadFileThunkPayload
         merge: {
           status: TaskStatus.Error,
         },
+      });
+      analyticsService.trackFileDownloadError({
+        fileId: file.id,
+        folderId: file.folderId,
+        size: Number(file.size),
+        type: file.type,
       });
       rejectWithValue(castedError);
     }

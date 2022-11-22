@@ -217,6 +217,10 @@ export function trackFileDownloadError(properties): void {
   window.rudderanalytics.track('File Download Error', properties);
 }
 
+export function trackFileDownloadCancelled(properties): void {
+  window.rudderanalytics.track('File Download Cancelled', properties);
+}
+
 export function trackFileDownloadCompleted(properties): void {
   window.rudderanalytics.track('File Download Finished', properties);
 }
@@ -227,6 +231,10 @@ export function trackFolderDownloadStart(properties): void {
 
 export function trackFolderDownloadError(properties): void {
   window.rudderanalytics.track('Folder Download Error', properties);
+}
+
+export function trackFolderDownloadCancelled(properties): void {
+  window.rudderanalytics.track('Folder Download Cancelled', properties);
 }
 
 export function trackFolderDownloadCompleted(properties): void {
@@ -467,9 +475,11 @@ const analyticsService = {
   trackFileRename,
   trackFileDownloadStart,
   trackFileDownloadError,
+  trackFileDownloadCancelled,
   trackFileUploadFinished,
   trackFolderDownloadStart,
   trackFolderDownloadError,
+  trackFolderDownloadCancelled,
   trackFolderDownloadCompleted,
   trackFileUploadStart,
   trackFileUploadError,
