@@ -15,6 +15,9 @@ env:
   REACT_APP_RECAPTCHA_V3: ${{ secrets.REACT_APP_RECAPTCHA_V3 }}
   GENERATE_SOURCEMAP: ${{ secrets.GENERATE_SOURCEMAP }}
   REACT_APP_DRIVE_NEW_API_URL: ${{ secrets.REACT_APP_DRIVE_NEW_API_URL }}
+  REACT_APP_HOSTNAME: ${{ secrets.REACT_APP_HOSTNAME }}
+  REACT_APP_PROXY: ${{ secrets.REACT_APP_PROXY }}
+  REACT_APP_PHOTOS_API_URL: ${{ secrets.REACT_APP_PHOTOS_API_URL }}
   CI: false
 jobs:
   tests:
@@ -46,4 +49,3 @@ jobs:
           command: yarn test:e2e
           wait-on: http://localhost:3000
           wait-on-timeout: 600
-#trigger github actions
