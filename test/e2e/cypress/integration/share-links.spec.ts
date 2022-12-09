@@ -19,6 +19,16 @@ describe('Share link options', () => {
   });
 
   it('Should copy the share link of a shared file', () => {
+    cy.wrap(
+      Cypress.automation('remote:debugger:protocol', {
+        command: 'Browser.grantPermissions',
+        params: {
+          permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'],
+          origin: window.location.origin,
+        },
+      }),
+    );
+
     cy.get(DATA_TEST_FILE_LIST_FILE).eq(0).find(ID_DROPDOWN).click();
     cy.contains('Copy link').click();
 

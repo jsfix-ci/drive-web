@@ -11,6 +11,16 @@ describe('Download shared file', () => {
   });
 
   it('Should share a and download single file', () => {
+    cy.wrap(
+      Cypress.automation('remote:debugger:protocol', {
+        command: 'Browser.grantPermissions',
+        params: {
+          permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'],
+          origin: window.location.origin,
+        },
+      }),
+    );
+
     cy.get('[data-test=file-list-file] [data-test=share-file-button]').eq(0).click({ force: true });
 
     const WAIT_SECONDS = 5000;
